@@ -11,14 +11,16 @@ function App() {
   const searchHandler = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${baseEndpoint}${city}`);
-      const data = await response.json();
-      if (response.ok) {
-        setWeatherData(data);
-        console.log(data);
-      } else {
-        window.alert("Failed to fetch weather data");
-      }
+      setTimeout(async () => {
+        const response = await fetch(`${baseEndpoint}${city}`);
+        const data = await response.json();
+        if (response.ok) {
+          setWeatherData(data);
+          console.log(data);
+        } else {
+          window.alert("Failed to fetch weather data");
+        }
+      }, 500);
     } catch (error) {
       console.log(error);
     } finally {
