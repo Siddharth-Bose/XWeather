@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import "./App.css";
+
 const baseEndpoint =
   "https://api.weatherapi.com/v1/current.json?key=dc17ee14014b4ff2a9c132431230306&q=";
 
@@ -8,23 +9,27 @@ function App() {
   const [weatherData, setWeatherData] = useState(null);
   const [loading, setLoading] = useState(false);
 
+  const delay = (ms) => new Promise((res) => setTimeout(res, ms));
+
   const searchHandler = async () => {
+    setLoading(true); // start loading
     try {
-      setLoading(true);
-      setTimeout(async () => {
-        const response = await fetch(`${baseEndpoint}${city}`);
-        const data = await response.json();
-        if (response.ok) {
-          setWeatherData(data);
-          console.log(data);
-        } else {
-          window.alert("Failed to fetch weather data");
-        }
-      }, 500);
+      const [response] = await Promise.all([
+        fetch(`${baseEndpoint}${city}`),
+        delay(2000), // ensure minimum 2-second delay
+      ]);
+      const data = await response.json();
+
+      if (response.ok) {
+        setWeatherData(data);
+        console.log(data);
+      } else {
+        window.alert("Failed to fetch weather data");
+      }
     } catch (error) {
-      console.log(error);
+      console.error("Error fetching weather:", error);
     } finally {
-      setLoading(false);
+      setLoading(false); // only after 2 seconds
     }
   };
 
@@ -49,11 +54,13 @@ function App() {
         />
         <button onClick={searchHandler}>Search</button>
       </div>
+
       {loading && <p>Loading data…</p>}
-      {weatherData && (
+
+      {weatherData && !loading && (
         <div className="weather-cards">
           <div className="weather-card">
-            <h2>Temparature</h2>
+            <h2>Temperature</h2>
             <p>{weatherData?.current?.temp_c} °C</p>
           </div>
           <div className="weather-card">
